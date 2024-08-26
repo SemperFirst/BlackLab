@@ -5,8 +5,7 @@ import (
 	"net"
 	"strings"
 	"sync"
-
-	"SafeDp/scanner/tcp_scanner_1/vars"
+	"SafeDp/scanner/tcp_scanner_2/vars"
 )
 
 func GenerateTask(ipList []net.IP, ports []int) ([]map[string]int,int) {
@@ -21,33 +20,36 @@ func GenerateTask(ipList []net.IP, ports []int) ([]map[string]int,int) {
 	return tasks, len(tasks)
 }
 
-func AssigningTasks (tasks []map[string]int) {
-	scanBatch := len(tasks) / vars.ThreadNum
-	for i := 0; i < scanBatch; i++ {
-		curTask := tasks[vars.ThreadNum * i:vars.ThreadNum * (i + 1)]
-		RunTask(curTask)
+func RunTask(tasks []map[string]int){
+	wg := &sync.WaitGroup{}
+
+	//创建一个buffer为vars.threadNum*2的channel
+	taskChan := make(chan map[string]int, vars.ThreadNum*2)
+
+	//创建vars.ThreadNum个协程
+	for i :=0; i < vars.ThreadNum; i++ {
+		go Scan(taskChan, wg)
 	}
 
-	if len(tasks) % vars.ThreadNum > 0 {
-		lastTask := tasks[vars.ThreadNum * scanBatch:]
-		RunTask(lastTask)
-	}
-}
-
-func RunTask(tasks []map[string]int) {
-	var wg sync.WaitGroup
-	wg.Add(len(tasks))
+	//生产者，不断地往taskChan channnel中写入数据
 	for _, task := range tasks {
-		for ip, port := range task {
-			go func(ip string,port int) {
-				err := SaveResult(Connect(ip, port))
-				_ = err
-				wg.Done()
-			}(ip, port)
-		}
+		wg.Add(1)
+		taskChan <- task
 	}
+	close(taskChan)
 	wg.Wait()
 }
+
+func Scan(taskChan chan map[string]int, wg *sync.WaitGroup) {
+	for task := range taskChan {
+		for ip, port := range task {
+			err := SaveResult(Connect(ip, port))
+			_ = err
+			wg.Done()
+		}
+	}
+}	
+
 func SaveResult(ip string, port int, err error) error {
 	if err != nil {
 		return err
