@@ -1,10 +1,10 @@
 package main
 
-import(
+import (
+	"SafeDp/scanner/tcp_syn_scanner_demo/scan"
+	"SafeDp/scanner/tcp_syn_scanner_demo/util"
 	"fmt"
 	"os"
-	"sec-dev-in-action-src/scanner/tcp_syn_scanner_demo/scan"
-	"sec-dev-in-action-src/scanner/tcp_syn_scanner_demo/util"
 )
 
 func main() {
@@ -13,18 +13,23 @@ func main() {
 
 		ipList := os.Args[1]
 		portList := os.Args[2]
-		ipList, err := util.GetIpList(ipList)
+		ips, err := util.GetIpList(ipList)
 		ports, err := util.GetPorts(portList)
-		_ = err 
-		for _, ip := range ipList {
+		_ = err
+		fmt.Printf("Parsed IPs: %v\n", ips)
+		fmt.Printf("Parsed Ports: %v\n", ports)
+		for _, ip := range ips {
 			for _, port := range ports {
+				fmt.Printf("Scanning %v:%v\n", ip, port)
 				ip1, port1, err1 := scan.SynScan(ip.String(), port)
 				if err1 == nil && port1 > 0 {
-					fmt.Println("%v:%v is open\n", ip1, port1)
+					fmt.Printf("%v:%v is open\n", ip1, port1)
+				} else {
+					fmt.Printf("Scan failed for %v:%v - %v\n", ip, port, err1)
 				}
 			}
 		}
-	}else{
-		fmt.Println("Usage: %v <ip> <port>\n", os.Args[0])
+	} else {
+		fmt.Printf("%v iplist port\n", os.Args[0])
 	}
 }
