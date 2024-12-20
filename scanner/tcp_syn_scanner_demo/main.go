@@ -16,11 +16,8 @@ func main() {
 		ips, err := util.GetIpList(ipList)
 		ports, err := util.GetPorts(portList)
 		_ = err
-		fmt.Printf("Parsed IPs: %v\n", ips)
-		fmt.Printf("Parsed Ports: %v\n", ports)
 		for _, ip := range ips {
 			for _, port := range ports {
-				fmt.Printf("Scanning %v:%v\n", ip, port)
 				ip1, port1, err1 := scan.SynScan(ip.String(), port)
 				if err1 == nil && port1 > 0 {
 					fmt.Printf("%v:%v is open\n", ip1, port1)
