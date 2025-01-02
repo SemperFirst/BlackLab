@@ -94,7 +94,7 @@ func Scan(ctx *cli.Context) error {
 		vars.ThreadNum = ctx.Int("concurrency")
 	}
 
-	if strings.ToLower(vars.mode) == "syn"{
+	if strings.ToLower(vars.Mode) == "syn"{
 		CheckRoot()
 	}
 

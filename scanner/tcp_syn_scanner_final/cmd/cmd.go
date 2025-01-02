@@ -5,6 +5,7 @@ import (
 	"SafeDp/scanner/tcp_syn_scanner_final/util"
 )
 
+// ./main scan --iplist ip_list --port port_list --mode syn  --timeout 2 --concurrency 10
 var Scan = cli.Command{
 	Name: "scan",
 	Usage: "Start to scan",

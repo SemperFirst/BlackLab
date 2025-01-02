@@ -11,7 +11,7 @@ import (
 func main() {
 	app := cli.NewApp()
 	app.Name = "port_scanner"
-	app.Auther = "SemperFi"
+	app.Author = "SemperFi"
 	app.Usage = "A tcp/syn port scanner"
 	app.Version = "1.0.0"
 	app.Commands = []cli.Command{cmd.Scan}
