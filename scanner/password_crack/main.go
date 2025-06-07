@@ -11,7 +11,7 @@ func main() {
 	app := cli.NewApp()
 	app.Name = "password_crack"
 	app.Author = "SemperFi"
-	app.Email = "x@xsec.io"
+	app.Email = ""
 	app.Version = "2025/01/01"
 	app.Usage = "Weak password scanner"
 	app.Commands = []cli.Command{cmd.Scan}
