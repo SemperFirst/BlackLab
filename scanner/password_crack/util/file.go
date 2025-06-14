@@ -2,20 +2,19 @@ package util
 
 import (
 	"bufio"
-	"go/scanner"
 	"os"
 	"strconv"
 	"strings"
 
-	"safedp/scanner/password_crack/logger"
-	"safedp/scanner/password_crack/models"
-	"safedp/scanner/password_crack/vars"
+	"SafeDp/scanner/password_crack/logger"
+	"SafeDp/scanner/password_crack/models"
+	"SafeDp/scanner/password_crack/vars"
 )
 
 func ReadIpList(fileName string) (ipList []models.IpAddr) {
 	ipListFile, err := os.Open(fileName)
 	if err != nil {
-		logger.log.Fatalf("Open ip List file err, %s", err)
+		logger.Log.Fatalf("Open ip List file err, %s", err)
 	}
 	defer func() {
 		if ipListFile != nil {
@@ -41,7 +40,7 @@ func ReadIpList(fileName string) (ipList []models.IpAddr) {
 				addr := models.IpAddr{Ip: ip, Port: port, Protocol: protocol}
 				ipList = append(ipList, addr)
 			} else {
-				logger.log.Infof("Protocol %s not supported, skip", protocol)
+				logger.Log.Infof("Protocol %s not supported, skip", protocol)
 			}
 		} else {
 			port, err := strconv.Atoi(tmpPort[0])
@@ -50,13 +49,11 @@ func ReadIpList(fileName string) (ipList []models.IpAddr) {
 				if ok && vars.SupportProtocols[protocol] {
 					addr := models.IpAddr{Ip: ip, Port: port, Protocol: protocol}
 					ipList = append(ipList, addr)
-				} else {
-					logger.log.Infof("Port %d not supported, skip", port)
-				}
+				} 
 			}
 		}
+		}
 		return ipList
-	}
 }
 
 func ReadUserDict(userDict string)(users []string, err error){

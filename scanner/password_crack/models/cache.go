@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"SafeDP/scanner/password_crack/logger"
-	"SafeDP/scanner/password_crack/util/hash"
-	"SafeDP/scanner/password_crack/vars"
+	"SafeDp/scanner/password_crack/logger"
+	"SafeDp/scanner/password_crack/util/hash"
+	"SafeDp/scanner/password_crack/vars"
 
 	"github.com/patrickmn/go-cache"
 )
@@ -33,12 +33,12 @@ func SaveResult(result ScanResult, err error){
 		h := hash.MakeTaskHash(k)
 		hash.SetTaskHash(h)
 
-		_, found: = vars.CacheService.Get(k)
+		_, found := vars.CacheService.Get(k)
 		if !found {
 			logger.Log.Infof("Ip: %v, Port: %v, Protocol: [%v], Username: %v, Password: %v", result.Service.Ip,
 				result.Service.Port, result.Service.Protocol, result.Service.Username, result.Service.Password)
 		}
-		vars.CasheService.Set(k, result, cache.NoExpiration)
+		vars.CacheService.Set(k, result, cache.NoExpiration)
 	}
 }
 
@@ -73,4 +73,5 @@ func DumpToFile(filename string) (err error) {
 			result.Service.Password),
 		)
 	}
+	return err
 }

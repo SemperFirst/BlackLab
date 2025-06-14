@@ -3,8 +3,8 @@ package plugins
 import (
 	"fmt"
 	"net"
-	"Safedp/scanner/password_crack/models"
-	"Safedp/scanner/password_crack/vars"
+	"SafeDp/scanner/password_crack/models"
+	"SafeDp/scanner/password_crack/vars"
 
 	"golang.org/x/crypto/ssh"
 )

@@ -1,6 +1,6 @@
 package plugins
 import (
-	"safedp/scanner/password_crack/models"
+	"SafeDp/scanner/password_crack/models"
 	"fmt"
 	_ "github.com/denisenkom/go-mssqldb"
 	"database/sql"

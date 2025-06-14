@@ -1,7 +1,7 @@
 package plugins
 
 import (
-	"safedp/scanner/password_crack/models"
+	"SafeDp/scanner/password_crack/models"
 )
 
 type ScanFunc func(service models.Service) (result models.ScanResult, err error)

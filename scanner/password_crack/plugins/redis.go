@@ -2,8 +2,8 @@ package plugins
 
 import (
 	"fmt"
-	"safedp/scanner/password_crack/models"
-	"safedp/scanner/password_crack/vars"
+	"SafeDp/scanner/password_crack/models"
+	"SafeDp/scanner/password_crack/vars"
 	"github.com/go-redis/redis"
 )
 

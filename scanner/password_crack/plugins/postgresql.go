@@ -6,7 +6,7 @@ import (
 
 	_ "github.com/lib/pq"
 
-	"sec-dev-in-action-src/scanner/password_crack/models"
+	"SafeDp/scanner/password_crack/models"
 )
 
 func ScanPostgres(service models.Service) (result models.ScanResult, err error) {

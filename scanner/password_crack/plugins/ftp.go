@@ -3,8 +3,8 @@ package plugins
 import (
 	"fmt"
 	"github.com/jlaffaye/ftp"
-	"Safedp/scanner/password_crack/models"
-	"Safedp/scanner/password_crack/vars"
+	"SafeDp/scanner/password_crack/models"
+	"SafeDp/scanner/password_crack/vars"
 )
 
 func ScanFtp(s models.Service) (result models.ScanResult, err error) {

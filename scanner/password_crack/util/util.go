@@ -4,10 +4,10 @@ import (
 	"sync"
 	"fmt"
 	"net"
-	"gopkg.in/chaeggaa/pb.v2"
-	"safedp/scanner/password_crack/models"
-	"safedp/scanner/password_crack/logger"
-	"safedp/scanner/password_crack/vars"
+	"gopkg.in/cheggaaa/pb.v2"
+	"SafeDp/scanner/password_crack/models"
+	"SafeDp/scanner/password_crack/logger"
+	"SafeDp/scanner/password_crack/vars"
 )
 
 var (
@@ -40,7 +40,7 @@ func CheckAlive(ipList []models.IpAddr) []models.IpAddr {
 
 func check(ipAddr models.IpAddr) (bool,models.IpAddr){
 	alive := false
-	_,err := net.DialTimeout("tcp", fmt.Sprintf("%v:%v", ipAddr.Ip, ipAddr.Port), vars.Timeout)
+	_,err := net.DialTimeout("tcp", fmt.Sprintf("%v:%v", ipAddr.Ip, ipAddr.Port), vars.TimeOut)
 	if err == nil {
 		alive = true
 	}

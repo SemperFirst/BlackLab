@@ -5,8 +5,8 @@ import (
 
 	"gopkg.in/mgo.v2"
 
-	"sec-dev-in-action-src/scanner/password_crack/models"
-	"sec-dev-in-action-src/scanner/password_crack/vars"
+	"SafeDp/scanner/password_crack/models"
+	"SafeDp/scanner/password_crack/vars"
 )
 
 func ScanMongodb(s models.Service) (result models.ScanResult, err error) {

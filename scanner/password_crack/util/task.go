@@ -3,21 +3,22 @@ package util
 import (
 	"fmt"
 	"runtime"
-	"sync"
+	"SafeDp/scanner/password_crack/logger"
+	"SafeDp/scanner/password_crack/models"
+	"SafeDp/scanner/password_crack/plugins"
+	"SafeDp/scanner/password_crack/util/hash"
+	"SafeDp/scanner/password_crack/vars"
 	"strings"
+	"sync"
 	"time"
-	"safedp/scanner/password_crack/logger"
-	"safedp/scanner/password_crack/models"
-	"safedp/scanner/password_crack/vars"
-	"safedp/scanner/password_crack/util/hash"
-	"safedp/scanner/password_crack/plugins"
-	"gopkg.in/chaeggaa/pb.v2"
-	"github.com/urfave/cli"
+
 	"github.com/sirupsen/logrus"
+	"github.com/urfave/cli"
+	"gopkg.in/cheggaaa/pb.v2"
 )
 
-func GenerateTask(ipList []models.IpAddr,users []string, passwords []string) (tasks []models.Service,taskNum int) {
-	tasks = make([]models.Service, 0) 
+func GenerateTask(ipList []models.IpAddr, users []string, passwords []string) (tasks []models.Service, taskNum int) {
+	tasks = make([]models.Service, 0)
 	for _, user := range users {
 		for _, password := range passwords {
 			for _, ipAddr := range ipList {
@@ -25,7 +26,7 @@ func GenerateTask(ipList []models.IpAddr,users []string, passwords []string) (ta
 					Ip:       ipAddr.Ip,
 					Port:     ipAddr.Port,
 					Protocol: ipAddr.Protocol,
-					User:     user,
+					Username:     user,
 					Password: password,
 				}
 				tasks = append(tasks, task)
@@ -36,7 +37,7 @@ func GenerateTask(ipList []models.IpAddr,users []string, passwords []string) (ta
 	return tasks, taskNum
 }
 
-func RunTask(tasks []models.Service){
+func RunTask(tasks []models.Service) {
 	totalTask := len(tasks)
 	vars.ProgressBar = pb.StartNew(totalTask)
 	vars.ProgressBar.SetTemplate(`{{ rndcolor "Scanning progress: " }} {{  percent . "[%.02f%%]" "[?]"| rndcolor}} {{ counters . "[%s/%s]" "[%s/?]" | rndcolor}} {{ bar . "「" "-" (rnd "ᗧ" "◔" "◕" "◷" ) "•" "」" | rndcolor }} {{rtime . | rndcolor}} `)
@@ -62,14 +63,14 @@ func RunTask(tasks []models.Service){
 		_ = models.DumpToFile(vars.ResultFile)
 	}
 }
-			
+
 func crackPassword(taskChan chan models.Service, wg *sync.WaitGroup) {
 	for task := range taskChan {
 		vars.ProgressBar.Increment()
 		if vars.DebugMode {
 			logger.Log.Debugf("checking: Ip: %v, Port: %v, [%v], Username: %v, Password: %v, goroutineNum: %v",
-				task.Ip, task.Port, task.Protocol, task.User, task.Password, runtime.NumGoroutine())
-		} 
+				task.Ip, task.Port, task.Protocol, task.Username, task.Password, runtime.NumGoroutine())
+		}
 		var k string
 		protocol := strings.ToUpper(task.Protocol)
 		if protocol == "REDIS" {
@@ -89,7 +90,7 @@ func crackPassword(taskChan chan models.Service, wg *sync.WaitGroup) {
 	}
 }
 
-func Scan(ctx *cli.Context) (err error){
+func Scan(ctx *cli.Context) (err error) {
 	if ctx.IsSet("debug") {
 		vars.DebugMode = ctx.Bool("debug")
 	}
@@ -101,7 +102,7 @@ func Scan(ctx *cli.Context) (err error){
 	if ctx.IsSet("timeout") {
 		vars.TimeOut = time.Duration(ctx.Int("timeout")) * time.Second
 	}
-		if ctx.IsSet("scan_num") {
+	if ctx.IsSet("scan_num") {
 		vars.ScanNum = ctx.Int("scan_num")
 	}
 
@@ -131,7 +132,7 @@ func Scan(ctx *cli.Context) (err error){
 		tasks, _ := GenerateTask(aliveIpList, userDict, passDict)
 		RunTask(tasks)
 	}
-	return	err
+	return err
 }
 
 func waitTimeout(wg *sync.WaitGroup, timeout time.Duration) bool {

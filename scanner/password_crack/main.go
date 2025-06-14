@@ -1,9 +1,11 @@
-package main 
+package main
 
 import (
 	"os"
 	"runtime"
+
 	"SafeDp/scanner/password_crack/cmd"
+
 	"github.com/urfave/cli"
 )
 
@@ -23,4 +25,3 @@ func main() {
 func init() {
 	runtime.GOMAXPROCS(runtime.NumCPU())
 }
-	
