@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"SafeDP/scanner/proxy_crack/models"
-	"SafeDP/scanner/proxy_crack/util/util"
+	"SafeDP/scanner/proxy_scanner/models"
+	"SafeDP/scanner/proxy_scanner/util/util"
 )
 
 var (
