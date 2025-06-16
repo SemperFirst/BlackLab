@@ -22,8 +22,8 @@ func CheckHttpProxy(ip string, port int, protocol string) (isProxy bool, proxyIn
 	proxyInfo.Port = port
 	proxyInfo.Protocol = protocol
 
-	rawProxy := fmt.Sprintf("%v://%v:%v", protocol, ip, port)
-	proxyUrl, err := url.Parse(rawProxy)
+	rawProxyUrl := fmt.Sprintf("%v://%v:%v", protocol, ip, port)
+	proxyUrl, err := url.Parse(rawProxyUrl)
 	if err != nil {
 		return
 	}
