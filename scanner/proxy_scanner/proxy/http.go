@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"SafeDP/scanner/proxy_scanner/models"
-	"SafeDP/scanner/proxy_scanner/util/util"
+	"SafeDp/scanner/proxy_scanner/models"
+	"SafeDp/scanner/proxy_scanner/util"
 )
 
 var (
@@ -48,6 +48,6 @@ func CheckHttpProxy(ip string, port int, protocol string) (isProxy bool, proxyIn
 		}
 	}
 
-	util.log.Debugf("Checking proxy: %v, isProxy: %v", rawProxyUrl, isProxy)
+	util.Log.Debugf("Checking proxy: %v, isProxy: %v", rawProxyUrl, isProxy)
 	return
 }

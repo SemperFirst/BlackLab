@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 	"h12.io/socks"
-	"SafeDP/scanner/proxy_scanner/models"
-	"SafeDP/scanner/proxy_scanner/util"
+	"SafeDp/scanner/proxy_scanner/models"
+	"SafeDp/scanner/proxy_scanner/util"
 )
 var (
 	SockProxyProtocol = map[string]int{
