@@ -35,4 +35,12 @@ func GetCommand(c *gin.Context) {
 
 //
 func SendResult(c *gin.Context) {
+	cmdId := c.Param("id")
+	result := c.PostForm("result")
+	id,_ := strconv.Atoi(cmdId)
+	err := models.UpdateCommandResult(int64(id), result)
+	fmt.Println(cmdId, result, err, c.Request.PostForm)
+	if err == nil {
+		err = models.SetCmdStatusToFinished(int64(id))
+	}
 }
