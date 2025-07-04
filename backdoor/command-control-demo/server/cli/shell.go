@@ -3,7 +3,7 @@ package cli
 import (
 	"errors"
 	"strings"
-	"gopkg.in/abiosoft/ishell.v2"
+	"github.com/abiosoft/ishell/v2"
 	"SafeDp/backdoor/command-control-demo/server/models"
 )
 
@@ -60,7 +60,7 @@ func Shell() error {
 			} else {
 				agentId := c.Args[0]
 				cmd := c.Args[1:]
-				c := string.Join(cmd," ")
+				c := strings.Join(cmd," ")
 				_ = RunCommand(agentId, c)
 			}
 		},

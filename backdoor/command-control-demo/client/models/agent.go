@@ -97,7 +97,7 @@ func NewAgent(debug bool, protocol string)(*Agent, error) {
 func (a *Agent) ParseInfo() AgentInfo {
 	return AgentInfo{
 		Id:		  0,
-		AgentId:   a.AgentId,
+		AgentId:   a.AgentId.String(),
 		Platform: a.Platform,
 		Architecture: a.Architecture,
 		UserName:  a.UserAgent,

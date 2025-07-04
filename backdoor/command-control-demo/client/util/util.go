@@ -53,6 +53,7 @@ func Command() {
 		resp, err := Agent.Client.Do(req)
 		if err == nil {
 			r, err := io.ReadAll(resp.Body)
+			if err == nil {
 			cmds := make([]models.Command,0)
 			err = json.Unmarshal(r, &cmds)
 			for _, cmd := range cmds {
@@ -63,6 +64,7 @@ func Command() {
 			_ = resp.Body.Close()
 		}
 	}
+}
 }
 
 func execCmd(command string) (string, error) {

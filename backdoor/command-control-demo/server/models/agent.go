@@ -52,6 +52,6 @@ func ExistAgentId(agentId string) (bool, error) {
 
 func RemoveAll() error {
 	_, err := Engine.Exec("DELETE FROM agent")
-	return nil
+	return err
 }
 

@@ -17,7 +17,7 @@ func Ping(c *gin.Context) {
 	agentId := agent.AgentId
 	has, err := models.ExistAgentId(agentId)
 	if err == nil && has {
-		_ = models.UpdateAgent(agent)
+		_ = models.UpdateAgent(agentId)
 	} else {
 		err = agent.Insert()
 		fmt.Println(err)
@@ -27,7 +27,7 @@ func Ping(c *gin.Context) {
 // 服务端下发命令给客户端
 func GetCommand(c *gin.Context) { 
 	agentId := c.Param("uuid")
-	cmds,_ := models.GetCommandByAgentId(agentId)
+	cmds,_ := models.ListCommandByAgentId(agentId)
 	cmdJson, _ := json.Marshal(cmds)
 	fmt.Println(agentId, string(cmdJson))
 	c.JSON(http.StatusOK, cmds)
