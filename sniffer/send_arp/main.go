@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 	"time"
+	"os"
 
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
@@ -53,7 +54,7 @@ func send(iFace *net.Interface, localIp, ip net.IP) error {
 		time.Sleep(1 * time.Second)
 	}
 }
-
+e
 func readARP(handle *pcap.Handle, iFace *net.Interface, stop chan struct{}){
 	src := gopacket.NewPacketSource(handle, layers.LayerTypeEthernet)
 	in := src.Packets()
